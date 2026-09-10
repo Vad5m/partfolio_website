@@ -1,0 +1,1513 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Хакерский стиль · фиксированный хедер</title>
+    <style>
+        /* ---------- Глобальный сброс ---------- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0a0a0a;
+            min-height: 100vh;
+            font-family: "Courier New", monospace;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            overflow-x: hidden;
+            padding-bottom: 60px;
+            padding-top: 100px;
+            /* отступ сверху для фиксированного хедера */
+        }
+
+        /* ---- СЕТЧАТЫЙ ФОН (чёрно-жёлтый) ---- */
+        .grid-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            background:
+                repeating-linear-gradient(0deg,
+                    rgba(255, 215, 0, 0.10) 0px,
+                    rgba(255, 215, 0, 0.10) 1px,
+                    transparent 1px,
+                    transparent 15px),
+                repeating-linear-gradient(90deg,
+                    rgba(255, 215, 0, 0.10) 0px,
+                    rgba(255, 215, 0, 0.10) 1px,
+                    transparent 1px,
+                    transparent 15px);
+        }
+
+        /* --- Анимированные линии сетки (жёлтые) --- */
+        .grid-line {
+            position: absolute;
+            background: #ffd700;
+            opacity: 0.3;
+            animation: grid-flow 2.5s linear infinite;
+            pointer-events: none;
+        }
+        .grid-line:nth-child(odd) {
+            width: 100%;
+            height: 1px;
+        }
+        .grid-line:nth-child(even) {
+            height: 100%;
+            width: 1px;
+        }
+        .grid-line:nth-child(1) {
+            top: 15%;
+        }
+        .grid-line:nth-child(2) {
+            left: 25%;
+        }
+        .grid-line:nth-child(3) {
+            top: 55%;
+            animation-delay: -0.8s;
+        }
+        .grid-line:nth-child(4) {
+            left: 65%;
+            animation-delay: -1.6s;
+        }
+        .grid-line:nth-child(5) {
+            top: 85%;
+            animation-delay: -1.2s;
+        }
+
+        /* ---------- ФИКСИРОВАННЫЙ ХЕДЕР-БЛОК С КНОПКАМИ ---------- */
+        .header-block {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            max-width: 1000px;
+            padding: 16px 40px;
+            background: #1a1a1a;
+            clip-path: polygon(10% 0, 100% 0, 90% 100%, 0% 100%);
+            color: #ffd700;
+            z-index: 100;
+            box-shadow: 0 0 40px rgba(255, 215, 0, 0.15);
+            border: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 30px 40px;
+            flex-wrap: wrap;
+            transition: box-shadow 0.3s ease;
+        }
+
+        .header-block:hover {
+            box-shadow: 0 0 60px rgba(255, 215, 0, 0.25);
+        }
+
+        .header-block::before {
+            content: "";
+            position: absolute;
+            top: -5px;
+            left: -5px;
+            width: calc(100% + 10px);
+            height: calc(100% + 10px);
+            border: 3px solid #ffd700;
+            clip-path: polygon(10% 0, 100% 0, 90% 100%, 0% 100%);
+            animation: neon-flicker 1.8s infinite;
+            z-index: -1;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+            pointer-events: none;
+        }
+
+        /* Декоративные элементы внутри хедера */
+        .header-block .circuit-traces,
+        .header-block .code-fragments,
+        .header-block .interference,
+        .header-block .scan-bars,
+        .header-block .text-glow {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            pointer-events: none;
+            top: 0;
+            left: 0;
+        }
+
+        .header-block .circuit-trace {
+            position: absolute;
+            background: #ffd700;
+            opacity: 0.2;
+            animation: circuit-flow 1.2s infinite ease-in-out;
+        }
+        .header-block .circuit-trace:nth-child(1) {
+            width: 2px;
+            height: 40%;
+            top: 0;
+            left: 15%;
+        }
+        .header-block .circuit-trace:nth-child(2) {
+            width: 50%;
+            height: 2px;
+            top: 25%;
+            right: 0;
+        }
+        .header-block .circuit-trace:nth-child(3) {
+            width: 2px;
+            height: 50%;
+            bottom: 0;
+            left: 40%;
+            animation-delay: -0.4s;
+        }
+        .header-block .circuit-trace:nth-child(4) {
+            width: 60%;
+            height: 2px;
+            bottom: 20%;
+            left: 0;
+            animation-delay: -0.8s;
+        }
+        .header-block .circuit-trace:nth-child(5) {
+            width: 2px;
+            height: 30%;
+            top: 10%;
+            right: 10%;
+            animation-delay: -1s;
+        }
+
+        .header-block .code-fragment {
+            position: absolute;
+            font-size: 0.4em;
+            color: #ffd700;
+            opacity: 0.15;
+            animation: code-drift 1.5s infinite;
+            text-shadow: 0 0 5px #ffd700;
+        }
+        .header-block .code-fragment:nth-child(1) {
+            top: 5%;
+            left: 10%;
+        }
+        .header-block .code-fragment:nth-child(2) {
+            top: 20%;
+            right: 15%;
+            animation-delay: -0.3s;
+        }
+        .header-block .code-fragment:nth-child(3) {
+            bottom: 10%;
+            left: 20%;
+            animation-delay: -0.6s;
+        }
+        .header-block .code-fragment:nth-child(4) {
+            bottom: 20%;
+            right: 10%;
+            animation-delay: -0.9s;
+        }
+        .header-block .code-fragment:nth-child(5) {
+            top: 50%;
+            left: 50%;
+            animation-delay: -1.2s;
+        }
+
+        .header-block .interference {
+            background: radial-gradient(circle, rgba(255, 215, 0, 0.08) 0%, transparent 60%);
+            animation: interference-pulse 2s infinite;
+            opacity: 0;
+        }
+        .header-block .scan-bar {
+            position: absolute;
+            width: 100%;
+            height: 3px;
+            background: rgba(255, 215, 0, 0.12);
+            animation: scan-bar 1.5s infinite ease-in-out;
+        }
+        .header-block .scan-bar:nth-child(1) {
+            top: 0;
+        }
+        .header-block .scan-bar:nth-child(2) {
+            bottom: 0;
+            animation-delay: -0.75s;
+            animation-direction: reverse;
+        }
+        .header-block .scan-bar:nth-child(3) {
+            top: 50%;
+            animation-delay: -0.5s;
+        }
+
+        .header-block .text-glow {
+            background: radial-gradient(circle, rgba(255, 215, 0, 0.06) 0%, transparent 70%);
+            opacity: 0;
+            animation: text-glow-pulse 2.5s infinite;
+            z-index: -1;
+        }
+
+        /* Кнопки в хедере */
+        .header-nav {
+            display: flex;
+            gap: 30px;
+            position: relative;
+            z-index: 2;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .header-btn {
+            position: relative;
+            padding: 12px 30px;
+            font-family: "Courier New", monospace;
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #ffd700;
+            background: transparent;
+            border: 2px solid #ffd700;
+            clip-path: polygon(10% 0, 100% 0, 90% 100%, 0% 100%);
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: all 0.3s ease;
+            text-shadow: 0 0 5px #ffd700;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.15);
+            background: rgba(26, 26, 26, 0.8);
+            overflow: hidden;
+        }
+
+        .header-btn::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.15), transparent);
+            transition: left 0.5s ease;
+            pointer-events: none;
+        }
+
+        .header-btn:hover::before {
+            left: 100%;
+        }
+
+        .header-btn:hover {
+            background: rgba(255, 215, 0, 0.15);
+            box-shadow: 0 0 40px rgba(255, 215, 0, 0.3), inset 0 0 30px rgba(255, 215, 0, 0.1);
+            transform: scale(1.05);
+            color: #fff;
+            text-shadow: 0 0 15px #ffd700, 0 0 30px #ffaa00;
+        }
+
+        .header-btn:active {
+            transform: scale(0.95);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.2);
+        }
+
+        .header-btn::after {
+            content: "";
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            width: calc(100% + 4px);
+            height: calc(100% + 4px);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            clip-path: polygon(10% 0, 100% 0, 90% 100%, 0% 100%);
+            pointer-events: none;
+            animation: neon-flicker 2.5s infinite;
+        }
+
+        /* ===== ОСНОВНОЙ БЛОК (я разработчик) ===== */
+        .content-block {
+            position: relative;
+            margin-top: 20px;
+            width: 80%;
+            max-width: 1000px;
+            padding: 40px 60px 40px 100px;
+            background: #1a1a1a;
+            clip-path: polygon(10% 0, 100% 0, 90% 100%, 0% 100%);
+            color: #ffd700;
+            z-index: 2;
+            box-shadow: 0 0 40px rgba(255, 215, 0, 0.15);
+            transition: box-shadow 0.4s ease, transform 0.3s ease;
+            border: none;
+            margin-bottom: 60px;
+        }
+
+        .content-block::before {
+            content: "";
+            position: absolute;
+            top: -5px;
+            left: -5px;
+            width: calc(100% + 10px);
+            height: calc(100% + 10px);
+            border: 3px solid #ffd700;
+            clip-path: polygon(10% 0, 100% 0, 90% 100%, 0% 100%);
+            animation: neon-flicker 1.8s infinite;
+            z-index: -1;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+            pointer-events: none;
+        }
+
+        .content-block .circuit-traces,
+        .content-block .code-fragments,
+        .content-block .interference,
+        .content-block .scan-bars,
+        .content-block .text-glow {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            pointer-events: none;
+            top: 0;
+            left: 0;
+        }
+
+        .content-block .circuit-trace {
+            position: absolute;
+            background: #ffd700;
+            opacity: 0.25;
+            animation: circuit-flow 1.2s infinite ease-in-out;
+        }
+        .content-block .circuit-trace:nth-child(1) {
+            width: 2px;
+            height: 40%;
+            top: 0;
+            left: 15%;
+        }
+        .content-block .circuit-trace:nth-child(2) {
+            width: 50%;
+            height: 2px;
+            top: 25%;
+            right: 0;
+        }
+        .content-block .circuit-trace:nth-child(3) {
+            width: 2px;
+            height: 50%;
+            bottom: 0;
+            left: 40%;
+            animation-delay: -0.4s;
+        }
+        .content-block .circuit-trace:nth-child(4) {
+            width: 60%;
+            height: 2px;
+            bottom: 20%;
+            left: 0;
+            animation-delay: -0.8s;
+        }
+        .content-block .circuit-trace:nth-child(5) {
+            width: 2px;
+            height: 30%;
+            top: 10%;
+            right: 10%;
+            animation-delay: -1s;
+        }
+
+        .content-block .code-fragment {
+            position: absolute;
+            font-size: 0.5em;
+            color: #ffd700;
+            opacity: 0.2;
+            animation: code-drift 1.5s infinite;
+            text-shadow: 0 0 5px #ffd700;
+        }
+        .content-block .code-fragment:nth-child(1) {
+            top: 5%;
+            left: 10%;
+        }
+        .content-block .code-fragment:nth-child(2) {
+            top: 20%;
+            right: 15%;
+            animation-delay: -0.3s;
+        }
+        .content-block .code-fragment:nth-child(3) {
+            bottom: 10%;
+            left: 20%;
+            animation-delay: -0.6s;
+        }
+        .content-block .code-fragment:nth-child(4) {
+            bottom: 20%;
+            right: 10%;
+            animation-delay: -0.9s;
+        }
+        .content-block .code-fragment:nth-child(5) {
+            top: 50%;
+            left: 50%;
+            animation-delay: -1.2s;
+        }
+
+        .content-block .interference {
+            background: radial-gradient(circle, rgba(255, 215, 0, 0.10) 0%, transparent 60%);
+            animation: interference-pulse 2s infinite;
+            opacity: 0;
+        }
+        .content-block .scan-bar {
+            position: absolute;
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 215, 0, 0.15);
+            animation: scan-bar 1.5s infinite ease-in-out;
+        }
+        .content-block .scan-bar:nth-child(1) {
+            top: 0;
+        }
+        .content-block .scan-bar:nth-child(2) {
+            bottom: 0;
+            animation-delay: -0.75s;
+            animation-direction: reverse;
+        }
+        .content-block .scan-bar:nth-child(3) {
+            top: 50%;
+            animation-delay: -0.5s;
+        }
+
+        .content-block .text-glow {
+            background: radial-gradient(circle, rgba(255, 215, 0, 0.08) 0%, transparent 70%);
+            opacity: 0;
+            animation: text-glow-pulse 2.5s infinite;
+        }
+
+        .content-block h2 {
+            font-size: 2.4em;
+            text-transform: lowercase;
+            letter-spacing: 3px;
+            margin-bottom: 25px;
+            text-shadow: 0 0 15px #ffd700, 0 0 30px #cc9900;
+            position: relative;
+            z-index: 3;
+            font-family: "Courier New", monospace;
+            color: #ffd700;
+            padding-left: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: nowrap;
+            white-space: nowrap;
+        }
+
+        .content-block h2 .letter-ya {
+            color: #ffd700;
+            text-shadow: 0 0 25px #ffd700, 0 0 50px #ffaa00;
+            font-weight: bold;
+            margin-right: 5px;
+            min-width: 30px;
+            display: inline-block;
+            flex-shrink: 0;
+        }
+
+        .content-block h2 .profession-wrapper {
+            display: inline-block;
+            min-width: 200px;
+            position: relative;
+            height: 1.2em;
+            overflow: visible;
+            flex-shrink: 0;
+        }
+
+        .content-block h2 .profession-slide {
+            display: block;
+            color: #ffd700;
+            text-shadow: 0 0 20px #ffd700, 0 0 40px #cc9900;
+            text-align: left;
+            position: absolute;
+            width: 100%;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            transform: translateY(20px);
+            white-space: nowrap;
+        }
+
+        .content-block h2 .profession-slide.active {
+            opacity: 1;
+            transform: translateY(0);
+            animation: slideIn 0.6s ease-in-out forwards;
+        }
+
+        .content-block h2 .profession-slide.exit {
+            animation: slideOut 0.5s ease-in-out forwards;
+        }
+
+        @keyframes slideIn {
+            0% {
+                opacity: 0;
+                transform: translateY(20px) scale(0.95);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        @keyframes slideOut {
+            0% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-20px) scale(0.95);
+            }
+        }
+
+        .content-block p {
+            font-size: 1.15em;
+            line-height: 1.9;
+            color: #e6e6e6;
+            text-shadow: 0 0 8px rgba(255, 215, 0, 0.2);
+            position: relative;
+            z-index: 3;
+            max-width: 95%;
+            margin-bottom: 12px;
+            padding-left: 20px;
+        }
+
+        .content-block p .highlight {
+            color: #ffd700;
+            text-shadow: 0 0 10px #ffd700;
+        }
+
+        /* ===== КАРУСЕЛЬ ===== */
+        .carousel-wrapper {
+            width: 100%;
+            overflow: hidden;
+            position: relative;
+            z-index: 2;
+            padding: 20px 0 20px 0;
+            background: transparent;
+            margin-bottom: 60px;
+        }
+
+        .carousel-track {
+            display: flex;
+            gap: 40px;
+            animation: scrollCarousel 20s linear infinite;
+            width: max-content;
+            will-change: transform;
+        }
+
+        .carousel-track:hover {
+            animation-play-state: paused;
+        }
+
+        .carousel-item {
+            flex-shrink: 0;
+            width: 320px;
+            height: 220px;
+            background: #1a1a1a;
+            clip-path: polygon(10% 0, 100% 0, 90% 100%, 0% 100%);
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3em;
+            font-weight: bold;
+            color: #ffd700;
+            text-shadow: 0 0 15px #ffd700, 0 0 30px #cc9900;
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.1);
+            transition: box-shadow 0.3s ease, transform 0.3s ease;
+            border: none;
+            cursor: default;
+        }
+
+        .carousel-item::before {
+            content: "";
+            position: absolute;
+            top: -5px;
+            left: -5px;
+            width: calc(100% + 10px);
+            height: calc(100% + 10px);
+            border: 3px solid #ffd700;
+            clip-path: polygon(10% 0, 100% 0, 90% 100%, 0% 100%);
+            animation: neon-flicker 1.8s infinite;
+            z-index: -1;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+            pointer-events: none;
+        }
+
+        .carousel-item .circuit-traces {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            pointer-events: none;
+            top: 0;
+            left: 0;
+        }
+
+        .carousel-item .circuit-trace {
+            position: absolute;
+            background: #ffd700;
+            opacity: 0.2;
+            animation: circuit-flow 1.2s infinite ease-in-out;
+        }
+        .carousel-item .circuit-trace:nth-child(1) {
+            width: 2px;
+            height: 40%;
+            top: 0;
+            left: 15%;
+        }
+        .carousel-item .circuit-trace:nth-child(2) {
+            width: 50%;
+            height: 2px;
+            top: 25%;
+            right: 0;
+        }
+        .carousel-item .circuit-trace:nth-child(3) {
+            width: 2px;
+            height: 50%;
+            bottom: 0;
+            left: 40%;
+            animation-delay: -0.4s;
+        }
+        .carousel-item .circuit-trace:nth-child(4) {
+            width: 60%;
+            height: 2px;
+            bottom: 20%;
+            left: 0;
+            animation-delay: -0.8s;
+        }
+        .carousel-item .circuit-trace:nth-child(5) {
+            width: 2px;
+            height: 30%;
+            top: 10%;
+            right: 10%;
+            animation-delay: -1s;
+        }
+
+        .carousel-item .code-fragments {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            pointer-events: none;
+            top: 0;
+            left: 0;
+        }
+
+        .carousel-item .code-fragment {
+            position: absolute;
+            font-size: 0.3em;
+            color: #ffd700;
+            opacity: 0.15;
+            animation: code-drift 1.5s infinite;
+            text-shadow: 0 0 5px #ffd700;
+        }
+        .carousel-item .code-fragment:nth-child(1) {
+            top: 5%;
+            left: 10%;
+        }
+        .carousel-item .code-fragment:nth-child(2) {
+            top: 20%;
+            right: 15%;
+            animation-delay: -0.3s;
+        }
+        .carousel-item .code-fragment:nth-child(3) {
+            bottom: 10%;
+            left: 20%;
+            animation-delay: -0.6s;
+        }
+        .carousel-item .code-fragment:nth-child(4) {
+            bottom: 20%;
+            right: 10%;
+            animation-delay: -0.9s;
+        }
+        .carousel-item .code-fragment:nth-child(5) {
+            top: 50%;
+            left: 50%;
+            animation-delay: -1.2s;
+        }
+
+        .carousel-item .interference {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255, 215, 0, 0.08) 0%, transparent 60%);
+            animation: interference-pulse 2s infinite;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .carousel-item .scan-bars {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            pointer-events: none;
+            top: 0;
+            left: 0;
+        }
+
+        .carousel-item .scan-bar {
+            position: absolute;
+            width: 100%;
+            height: 3px;
+            background: rgba(255, 215, 0, 0.15);
+            animation: scan-bar 1.5s infinite ease-in-out;
+        }
+        .carousel-item .scan-bar:nth-child(1) {
+            top: 0;
+        }
+        .carousel-item .scan-bar:nth-child(2) {
+            bottom: 0;
+            animation-delay: -0.75s;
+            animation-direction: reverse;
+        }
+        .carousel-item .scan-bar:nth-child(3) {
+            top: 50%;
+            animation-delay: -0.5s;
+        }
+
+        .carousel-item .text-glow {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255, 215, 0, 0.08) 0%, transparent 70%);
+            opacity: 0;
+            animation: text-glow-pulse 2.5s infinite;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .carousel-item .item-number {
+            position: relative;
+            z-index: 2;
+            font-size: 2.4em;
+            font-weight: bold;
+            color: #ffd700;
+            text-shadow: 0 0 20px #ffd700, 0 0 40px #cc9900;
+        }
+
+        @keyframes scrollCarousel {
+            0% {
+                transform: translateX(0);
+            }
+            100% {
+                transform: translateX(-50%);
+            }
+        }
+
+        /* ===== НИЖНИЙ БЛОК ===== */
+        .bottom-block {
+            position: relative;
+            width: 80%;
+            max-width: 1000px;
+            padding: 40px 60px 40px 60px;
+            background: #1a1a1a;
+            clip-path: polygon(10% 0, 100% 0, 90% 100%, 0% 100%);
+            color: #ffd700;
+            z-index: 2;
+            box-shadow: 0 0 40px rgba(255, 215, 0, 0.15);
+            transition: box-shadow 0.4s ease, transform 0.3s ease;
+            border: none;
+            margin-top: 20px;
+        }
+
+        .bottom-block::before {
+            content: "";
+            position: absolute;
+            top: -5px;
+            left: -5px;
+            width: calc(100% + 10px);
+            height: calc(100% + 10px);
+            border: 3px solid #ffd700;
+            clip-path: polygon(10% 0, 100% 0, 90% 100%, 0% 100%);
+            animation: neon-flicker 1.8s infinite;
+            z-index: -1;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+            pointer-events: none;
+        }
+
+        .bottom-block .circuit-traces,
+        .bottom-block .code-fragments,
+        .bottom-block .interference,
+        .bottom-block .scan-bars,
+        .bottom-block .text-glow {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            pointer-events: none;
+            top: 0;
+            left: 0;
+        }
+
+        .bottom-block .circuit-trace {
+            position: absolute;
+            background: #ffd700;
+            opacity: 0.25;
+            animation: circuit-flow 1.2s infinite ease-in-out;
+        }
+        .bottom-block .circuit-trace:nth-child(1) {
+            width: 2px;
+            height: 40%;
+            top: 0;
+            left: 15%;
+        }
+        .bottom-block .circuit-trace:nth-child(2) {
+            width: 50%;
+            height: 2px;
+            top: 25%;
+            right: 0;
+        }
+        .bottom-block .circuit-trace:nth-child(3) {
+            width: 2px;
+            height: 50%;
+            bottom: 0;
+            left: 40%;
+            animation-delay: -0.4s;
+        }
+        .bottom-block .circuit-trace:nth-child(4) {
+            width: 60%;
+            height: 2px;
+            bottom: 20%;
+            left: 0;
+            animation-delay: -0.8s;
+        }
+        .bottom-block .circuit-trace:nth-child(5) {
+            width: 2px;
+            height: 30%;
+            top: 10%;
+            right: 10%;
+            animation-delay: -1s;
+        }
+
+        .bottom-block .code-fragment {
+            position: absolute;
+            font-size: 0.5em;
+            color: #ffd700;
+            opacity: 0.2;
+            animation: code-drift 1.5s infinite;
+            text-shadow: 0 0 5px #ffd700;
+        }
+        .bottom-block .code-fragment:nth-child(1) {
+            top: 5%;
+            left: 10%;
+        }
+        .bottom-block .code-fragment:nth-child(2) {
+            top: 20%;
+            right: 15%;
+            animation-delay: -0.3s;
+        }
+        .bottom-block .code-fragment:nth-child(3) {
+            bottom: 10%;
+            left: 20%;
+            animation-delay: -0.6s;
+        }
+        .bottom-block .code-fragment:nth-child(4) {
+            bottom: 20%;
+            right: 10%;
+            animation-delay: -0.9s;
+        }
+        .bottom-block .code-fragment:nth-child(5) {
+            top: 50%;
+            left: 50%;
+            animation-delay: -1.2s;
+        }
+
+        .bottom-block .interference {
+            background: radial-gradient(circle, rgba(255, 215, 0, 0.10) 0%, transparent 60%);
+            animation: interference-pulse 2s infinite;
+            opacity: 0;
+        }
+        .bottom-block .scan-bar {
+            position: absolute;
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 215, 0, 0.15);
+            animation: scan-bar 1.5s infinite ease-in-out;
+        }
+        .bottom-block .scan-bar:nth-child(1) {
+            top: 0;
+        }
+        .bottom-block .scan-bar:nth-child(2) {
+            bottom: 0;
+            animation-delay: -0.75s;
+            animation-direction: reverse;
+        }
+        .bottom-block .scan-bar:nth-child(3) {
+            top: 50%;
+            animation-delay: -0.5s;
+        }
+
+        .bottom-block .text-glow {
+            background: radial-gradient(circle, rgba(255, 215, 0, 0.08) 0%, transparent 70%);
+            opacity: 0;
+            animation: text-glow-pulse 2.5s infinite;
+        }
+
+        .bottom-block p {
+            font-size: 1.15em;
+            line-height: 1.9;
+            color: #e6e6e6;
+            text-shadow: 0 0 8px rgba(255, 215, 0, 0.2);
+            position: relative;
+            z-index: 3;
+            max-width: 95%;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+
+        .bottom-block p .highlight {
+            color: #ffd700;
+            text-shadow: 0 0 10px #ffd700;
+        }
+
+        .bottom-block h3 {
+            font-size: 2em;
+            text-align: center;
+            margin-bottom: 20px;
+            color: #ffd700;
+            text-shadow: 0 0 20px #ffd700, 0 0 40px #cc9900;
+            position: relative;
+            z-index: 3;
+        }
+
+        /* ===== АНИМАЦИИ ===== */
+        @keyframes grid-flow {
+            0% {
+                transform: translateX(-100%) translateY(-100%);
+            }
+            100% {
+                transform: translateX(100%) translateY(100%);
+            }
+        }
+        @keyframes neon-flicker {
+            0%,
+            100% {
+                opacity: 1;
+                box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+            }
+            20% {
+                opacity: 0.7;
+                box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+            }
+            40% {
+                opacity: 0.9;
+                box-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+            }
+            60% {
+                opacity: 0.6;
+                box-shadow: 0 0 5px rgba(255, 215, 0, 0.2);
+            }
+            80% {
+                opacity: 0.95;
+                box-shadow: 0 0 25px rgba(255, 215, 0, 0.7);
+            }
+        }
+        @keyframes circuit-flow {
+            0% {
+                transform: scale(0.5) translateX(-30%);
+            }
+            50% {
+                transform: scale(1) translateX(0);
+            }
+            100% {
+                transform: scale(0.5) translateX(30%);
+            }
+        }
+        @keyframes code-drift {
+            0% {
+                transform: translateY(100%) rotate(-5deg);
+                opacity: 0;
+            }
+            50% {
+                transform: translateY(0) rotate(5deg);
+                opacity: 0.8;
+            }
+            100% {
+                transform: translateY(-100%) rotate(-5deg);
+                opacity: 0;
+            }
+        }
+        @keyframes interference-pulse {
+            0%,
+            100% {
+                transform: scale(0.9);
+                opacity: 0;
+            }
+            50% {
+                transform: scale(1.3);
+                opacity: 0.6;
+            }
+        }
+        @keyframes scan-bar {
+            0% {
+                transform: translateY(-100%);
+            }
+            50% {
+                transform: translateY(0);
+            }
+            100% {
+                transform: translateY(100%);
+            }
+        }
+        @keyframes text-glow-pulse {
+            0%,
+            100% {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            50% {
+                opacity: 0.3;
+                transform: scale(1.4);
+            }
+        }
+
+        /* ===== АДАПТИВНОСТЬ ===== */
+        @media (max-width: 1024px) {
+            body {
+                padding-top: 90px;
+            }
+            .header-block {
+                width: 90%;
+                padding: 14px 30px;
+                gap: 20px;
+                top: 15px;
+            }
+            .header-btn {
+                padding: 10px 24px;
+                font-size: 1em;
+            }
+            .content-block,
+            .bottom-block {
+                width: 90%;
+                padding: 30px 40px 30px 80px;
+                margin-top: 20px;
+            }
+            .bottom-block {
+                padding: 30px 40px;
+                margin-top: 20px;
+            }
+            .content-block h2 {
+                font-size: 2em;
+            }
+            .content-block p,
+            .bottom-block p {
+                font-size: 1em;
+            }
+            .content-block h2 .profession-wrapper {
+                min-width: 170px;
+            }
+            .carousel-item {
+                width: 260px;
+                height: 180px;
+            }
+            .carousel-item .item-number {
+                font-size: 2em;
+            }
+            .carousel-track {
+                gap: 30px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding-top: 80px;
+            }
+            .header-block {
+                width: 95%;
+                padding: 12px 20px;
+                top: 12px;
+                gap: 12px;
+            }
+            .header-nav {
+                gap: 12px;
+            }
+            .header-btn {
+                padding: 8px 18px;
+                font-size: 0.85em;
+                letter-spacing: 1px;
+            }
+            .content-block,
+            .bottom-block {
+                width: 95%;
+                padding: 25px 30px 25px 60px;
+                margin-top: 20px;
+            }
+            .bottom-block {
+                padding: 25px 30px;
+                margin-top: 20px;
+            }
+            .content-block h2 {
+                font-size: 1.6em;
+                letter-spacing: 2px;
+                padding-left: 10px;
+                gap: 5px;
+            }
+            .content-block p,
+            .bottom-block p {
+                font-size: 0.95em;
+                padding-left: 10px;
+            }
+            .bottom-block p {
+                padding-left: 0;
+            }
+            .content-block h2 .profession-wrapper {
+                min-width: 140px;
+            }
+            .carousel-item {
+                width: 200px;
+                height: 150px;
+            }
+            .carousel-item .item-number {
+                font-size: 1.6em;
+            }
+            .carousel-track {
+                gap: 25px;
+            }
+            .bottom-block h3 {
+                font-size: 1.5em;
+            }
+            .code-fragment {
+                font-size: 0.3em;
+            }
+        }
+
+        @media (max-width: 550px) {
+            body {
+                padding-top: 70px;
+            }
+            .header-block {
+                padding: 10px 12px;
+                clip-path: polygon(8% 0, 100% 0, 92% 100%, 0% 100%);
+                top: 10px;
+                gap: 10px;
+                width: 97%;
+            }
+            .header-block::before {
+                clip-path: polygon(8% 0, 100% 0, 92% 100%, 0% 100%);
+            }
+            .header-nav {
+                gap: 8px;
+            }
+            .header-btn {
+                padding: 6px 14px;
+                font-size: 0.7em;
+                letter-spacing: 1px;
+                clip-path: polygon(10% 0, 100% 0, 90% 100%, 0% 100%);
+            }
+            .content-block,
+            .bottom-block {
+                padding: 20px 20px 20px 45px;
+                margin-top: 20px;
+                clip-path: polygon(8% 0, 100% 0, 92% 100%, 0% 100%);
+            }
+            .bottom-block {
+                padding: 20px 20px;
+                clip-path: polygon(8% 0, 100% 0, 92% 100%, 0% 100%);
+                margin-top: 15px;
+            }
+            .content-block::before,
+            .bottom-block::before {
+                clip-path: polygon(8% 0, 100% 0, 92% 100%, 0% 100%);
+            }
+            .content-block h2 {
+                font-size: 1.3em;
+                letter-spacing: 1px;
+                padding-left: 5px;
+                gap: 4px;
+                flex-wrap: wrap;
+                white-space: normal;
+            }
+            .content-block h2 .profession-wrapper {
+                min-width: 110px;
+                height: 1.4em;
+            }
+            .content-block p,
+            .bottom-block p {
+                font-size: 0.85em;
+                max-width: 100%;
+                padding-left: 5px;
+            }
+            .bottom-block p {
+                padding-left: 0;
+            }
+            .carousel-item {
+                width: 150px;
+                height: 120px;
+            }
+            .carousel-item .item-number {
+                font-size: 1.3em;
+            }
+            .carousel-track {
+                gap: 18px;
+            }
+            .bottom-block h3 {
+                font-size: 1.2em;
+            }
+            .grid-line:nth-child(2),
+            .grid-line:nth-child(4) {
+                display: none;
+            }
+            .scan-bar {
+                height: 3px;
+            }
+            .code-fragment {
+                font-size: 0.2em;
+            }
+        }
+
+        @media (max-width: 400px) {
+            body {
+                padding-top: 60px;
+            }
+            .header-block {
+                padding: 8px 8px;
+                top: 8px;
+                gap: 6px;
+                width: 98%;
+            }
+            .header-btn {
+                padding: 5px 10px;
+                font-size: 0.6em;
+                letter-spacing: 0.5px;
+            }
+            .content-block,
+            .bottom-block {
+                padding: 15px 15px 15px 35px;
+                margin-top: 15px;
+            }
+            .bottom-block {
+                padding: 15px 15px;
+                margin-top: 12px;
+            }
+            .content-block h2 {
+                font-size: 1.0em;
+                padding-left: 3px;
+                gap: 3px;
+            }
+            .content-block h2 .profession-wrapper {
+                min-width: 85px;
+                height: 1.5em;
+            }
+            .content-block p,
+            .bottom-block p {
+                font-size: 0.75em;
+                padding-left: 3px;
+            }
+            .bottom-block p {
+                padding-left: 0;
+            }
+            .carousel-item {
+                width: 120px;
+                height: 95px;
+            }
+            .carousel-item .item-number {
+                font-size: 1.0em;
+            }
+            .carousel-track {
+                gap: 14px;
+            }
+            .bottom-block h3 {
+                font-size: 1em;
+            }
+            .code-fragment {
+                font-size: 0.15em;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- СЕТЧАТЫЙ ФОН -->
+    <div class="grid-bg">
+        <div class="grid-line"></div>
+        <div class="grid-line"></div>
+        <div class="grid-line"></div>
+        <div class="grid-line"></div>
+        <div class="grid-line"></div>
+    </div>
+
+    <!-- ФИКСИРОВАННЫЙ ХЕДЕР-БЛОК С КНОПКАМИ -->
+    <div class="header-block">
+        <!-- Декоративные элементы -->
+        <div class="circuit-traces">
+            <div class="circuit-trace"></div>
+            <div class="circuit-trace"></div>
+            <div class="circuit-trace"></div>
+            <div class="circuit-trace"></div>
+            <div class="circuit-trace"></div>
+        </div>
+        <div class="code-fragments">
+            <span class="code-fragment">0x1A</span>
+            <span class="code-fragment">1100</span>
+            <span class="code-fragment">DATA</span>
+            <span class="code-fragment">CODE</span>
+            <span class="code-fragment">RUN</span>
+        </div>
+        <div class="interference"></div>
+        <div class="scan-bars">
+            <div class="scan-bar"></div>
+            <div class="scan-bar"></div>
+            <div class="scan-bar"></div>
+        </div>
+        <div class="text-glow"></div>
+
+        <!-- Только кнопки -->
+        <div class="header-nav">
+            <button class="header-btn">Патфолио</button>
+            <button class="header-btn">Контакты</button>
+            <button class="header-btn">Услуги</button>
+        </div>
+    </div>
+
+    <!-- ОСНОВНОЙ БЛОК (я разработчик) -->
+    <div class="content-block">
+        <div class="circuit-traces">
+            <div class="circuit-trace"></div>
+            <div class="circuit-trace"></div>
+            <div class="circuit-trace"></div>
+            <div class="circuit-trace"></div>
+            <div class="circuit-trace"></div>
+        </div>
+        <div class="code-fragments">
+            <span class="code-fragment">0x1A</span>
+            <span class="code-fragment">1100</span>
+            <span class="code-fragment">DATA</span>
+            <span class="code-fragment">CODE</span>
+            <span class="code-fragment">RUN</span>
+        </div>
+        <div class="interference"></div>
+        <div class="scan-bars">
+            <div class="scan-bar"></div>
+            <div class="scan-bar"></div>
+            <div class="scan-bar"></div>
+        </div>
+        <div class="text-glow"></div>
+
+        <h2>
+            <span class="letter-ya">я</span>
+            <span class="profession-wrapper" id="professionWrapper">
+                <span class="profession-slide active" data-profession="разработчик">разработчик</span>
+            </span>
+        </h2>
+
+        <p>
+            <span class="highlight">Здравствуйте</span>, я в основном делаю проекты под себя,
+            но иногда делаю и на заказ. Меня зовут <span class="highlight">Вадим</span>,
+            но псевдонимов у меня не мало. Вы можете посмотреть мои работы в блоке
+            <span class="highlight">Патфолио</span>.
+        </p>
+    </div>
+
+    <!-- КАРУСЕЛЬ -->
+    <div class="carousel-wrapper">
+        <div class="carousel-track" id="carouselTrack"></div>
+    </div>
+
+    <!-- НИЖНИЙ БЛОК -->
+    <div class="bottom-block">
+        <div class="circuit-traces">
+            <div class="circuit-trace"></div>
+            <div class="circuit-trace"></div>
+            <div class="circuit-trace"></div>
+            <div class="circuit-trace"></div>
+            <div class="circuit-trace"></div>
+        </div>
+        <div class="code-fragments">
+            <span class="code-fragment">0x1A</span>
+            <span class="code-fragment">1100</span>
+            <span class="code-fragment">DATA</span>
+            <span class="code-fragment">CODE</span>
+            <span class="code-fragment">RUN</span>
+        </div>
+        <div class="interference"></div>
+        <div class="scan-bars">
+            <div class="scan-bar"></div>
+            <div class="scan-bar"></div>
+            <div class="scan-bar"></div>
+        </div>
+        <div class="text-glow"></div>
+
+        <h3>⚡ Ещё один блок</h3>
+        <p>
+            Это нижний блок, оформленный в том же <span class="highlight">чёрно-жёлтом</span>
+            хакерском стиле. Он находится под каруселью и завершает композицию страницы.
+        </p>
+    </div>
+
+    <!-- Скрипт для карусели -->
+    <script>
+        (function() {
+            const track = document.getElementById('carouselTrack');
+            const totalItems = 9;
+
+            for (let i = 1; i <= totalItems; i++) {
+                const item = document.createElement('div');
+                item.className = 'carousel-item';
+                item.innerHTML = `
+                    <div class="circuit-traces">
+                        <div class="circuit-trace"></div>
+                        <div class="circuit-trace"></div>
+                        <div class="circuit-trace"></div>
+                        <div class="circuit-trace"></div>
+                        <div class="circuit-trace"></div>
+                    </div>
+                    <div class="code-fragments">
+                        <span class="code-fragment">0x1A</span>
+                        <span class="code-fragment">1100</span>
+                        <span class="code-fragment">DATA</span>
+                        <span class="code-fragment">CODE</span>
+                        <span class="code-fragment">RUN</span>
+                    </div>
+                    <div class="interference"></div>
+                    <div class="scan-bars">
+                        <div class="scan-bar"></div>
+                        <div class="scan-bar"></div>
+                        <div class="scan-bar"></div>
+                    </div>
+                    <div class="text-glow"></div>
+                    <span class="item-number">#${i}</span>
+                `;
+                track.appendChild(item);
+            }
+
+            const items = track.querySelectorAll('.carousel-item');
+            items.forEach(item => {
+                const clone = item.cloneNode(true);
+                track.appendChild(clone);
+            });
+        })();
+    </script>
+
+    <!-- Скрипт для смены профессий -->
+    <script>
+        (function() {
+            const professions = ['разработчик', 'дизайнер', 'кодер', 'блогер', 'монтажер', 'мододел'];
+            let currentIndex = 0;
+            const wrapper = document.getElementById('professionWrapper');
+
+            function rotateProfession() {
+                const currentEl = wrapper.querySelector('.profession-slide.active');
+                if (!currentEl) return;
+
+                currentEl.classList.remove('active');
+                currentEl.classList.add('exit');
+
+                setTimeout(() => {
+                    currentEl.remove();
+
+                    currentIndex = (currentIndex + 1) % professions.length;
+                    const newProfession = professions[currentIndex];
+
+                    const newEl = document.createElement('span');
+                    newEl.className = 'profession-slide active';
+                    newEl.dataset.profession = newProfession;
+                    newEl.textContent = newProfession;
+
+                    wrapper.appendChild(newEl);
+
+                    wrapper.querySelectorAll('.profession-slide').forEach(el => {
+                        el.classList.remove('exit');
+                    });
+                }, 500);
+            }
+
+            setInterval(rotateProfession, 2800);
+        })();
+    </script>
+
+</body>
+</html>

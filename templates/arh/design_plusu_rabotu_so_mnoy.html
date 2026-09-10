@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Карточки услуг</title>
+    <style>
+        body {
+            margin: 0;
+            background-color: #000000;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        .features-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 24px;
+            max-width: 1240px;
+            margin: 0 auto;
+            padding: 60px 20px;
+            box-sizing: border-box;
+        }
+
+        *, *:before, *:after {
+            box-sizing: inherit;
+        }
+
+        /* Карточка: настоящий черный фон и тонкая рамка */
+        .feature-card {
+            position: relative;
+            background-color: #000000;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            overflow: hidden;
+            padding: 36px;
+            transition: border-color 0.3s ease;
+        }
+
+        .feature-card:hover {
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+
+        /* Фоновая сетка */
+        .card-bg-grid {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 80%;
+            height: 80%;
+            background-image:
+                linear-gradient(to right, rgba(255, 255, 255, 0.11) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 255, 255, 0.11) 1px, transparent 1px);
+            background-size: 28px 28px;
+            -webkit-mask-image: radial-gradient(circle at top right, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 75%);
+            mask-image: radial-gradient(circle at top right, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 75%);
+            pointer-events: none;
+        }
+
+        .card-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .feature-icon {
+            margin-bottom: 28px;
+            color: #FFFFFF;
+        }
+
+        .feature-icon svg {
+            width: 26px;
+            height: 26px;
+            stroke-width: 1.75px;
+        }
+
+        .feature-card h3 {
+            font-size: 20px;
+            font-weight: 500;
+            margin: 0 0 12px 0;
+            color: #FFFFFF;
+        }
+
+        .feature-card p {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #AAAAAA;
+            margin: 0;
+            font-weight: 400;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="features-container">
+      <!-- 1. Веб-разработка -->
+      <div class="feature-card">
+        <div class="card-bg-grid"></div>
+        <div class="card-content">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+          </div>
+          <h3>Веб-разработка</h3>
+          <p>Адаптивные и современные веб-сайты, созданные с использованием лучших технологий на рынке.</p>
+        </div>
+      </div>
+
+      <!-- 2. UI/UX дизайн -->
+      <div class="feature-card">
+        <div class="card-bg-grid"></div>
+        <div class="card-content">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"></circle><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"></circle><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"></circle><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"></circle><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c0.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.504 5.555-5.55C21.965 6.48 17.465 2 12 2z"></path></svg>
+          </div>
+          <h3>Дизайн</h3>
+          <p>Интуитивно понятные и привлекательные интерфейсы, превращающие посетителей в клиентов.</p>
+        </div>
+      </div>
+
+      <!-- 3. Адаптивный дизайн -->
+      <div class="feature-card">
+        <div class="card-bg-grid"></div>
+        <div class="card-content">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
+          </div>
+          <h3>Адаптивный дизайн</h3>
+          <p>Безупречная работа на всех устройствах и экранах любых размеров.</p>
+        </div>
+      </div>
+
+      <!-- 4. Производительность -->
+      <div class="feature-card">
+        <div class="card-bg-grid"></div>
+        <div class="card-content">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+          </div>
+          <h3>Производительность</h3>
+          <p>Сверхбыстрая работа сайтов и приложений для приятного использования.</p>
+        </div>
+      </div>
+
+      <!-- 5. SEO-оптимизировано -->
+      <div class="feature-card">
+        <div class="card-bg-grid"></div>
+        <div class="card-content">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          </div>
+          <h3>SEO-оптимизировано</h3>
+          <p>Веб-сайты, оптимизированные для отображения в верхней части результатов поиска Google и привлечения большего трафика.</p>
+        </div>
+      </div>
+
+      <!-- 6. Безопасность -->
+      <div class="feature-card">
+        <div class="card-bg-grid"></div>
+        <div class="card-content">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+          </div>
+          <h3>Безопасность</h3>
+          <p>Включает межсетевой экран приложений и расширенную защиту от угроз.</p>
+        </div>
+      </div>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,129 @@
+<!-- Binary Rings Widget -->
+<div class="binary-rings-widget">
+  <div class="binary-rings"></div>
+</div>
+
+<style>
+.binary-rings-widget {
+  position: relative;
+  width: 320px;
+  height: 320px;
+  overflow: hidden;
+  background: #000;
+  border-radius: 50%;
+}
+
+.binary-rings-widget .binary-rings {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 0;
+  height: 0;
+}
+
+.binary-rings-widget .ring {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: calc(var(--r) * 2);
+  height: calc(var(--r) * 2);
+  margin: calc(var(--r) * -1);
+  animation: binary-rings-spin var(--speed) linear infinite var(--dir);
+}
+
+.binary-rings-widget .bit {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform:
+    translate(-50%, -50%)
+    rotate(var(--a))
+    translateY(calc(var(--r) * -1));
+
+  font: 700 12px/1 monospace;
+  color: hsl(var(--h), 100%, 62%);
+  text-shadow: 0 0 8px currentColor;
+  user-select: none;
+  pointer-events: none;
+}
+
+@keyframes binary-rings-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+</style>
+
+<script>
+(() => {
+  const widget = document.querySelector(".binary-rings-widget");
+  const root = widget.querySelector(".binary-rings");
+
+  const rings = [
+    [40, 18, 18, "normal", 245],
+    [53, 22, 24, "reverse", 247],
+    [66, 26, 34, "normal", 249],
+    [79, 30, 48, "reverse", 251],
+    [92, 34, 66, "normal", 253],
+    [105, 38, 90, "reverse", 255],
+    [118, 42, 120, "normal", 257],
+    [131, 46, 150, "reverse", 259],
+    [144, 50, 180, "normal", 261]
+  ];
+
+  rings.forEach(([r, n, speed, dir, hue]) => {
+    const ring = document.createElement("div");
+
+    ring.className = "ring";
+    ring.style.cssText = `
+      --r: ${r}px;
+      --speed: ${speed}s;
+      --dir: ${dir};
+    `;
+
+    let gap = 0;
+
+    for (let i = 0; i < n; i++) {
+      if (gap > 0) {
+        gap--;
+        continue;
+      }
+
+      if (Math.random() < 0.13) {
+        gap = 2 + Math.floor(Math.random() * 4);
+        continue;
+      }
+
+      const bit = document.createElement("span");
+
+      bit.className = "bit";
+      bit.textContent = Math.random() < 0.5 ? "0" : "1";
+
+      bit.style.cssText = `
+        --a: ${i * 360 / n}deg;
+        --r: ${r}px;
+        --h: ${hue};
+      `;
+
+      ring.appendChild(bit);
+    }
+
+    root.appendChild(ring);
+  });
+
+  // Каждую секунду меняем 5 символов
+  setInterval(() => {
+    const bits = [...widget.querySelectorAll(".bit")];
+    const chosen = new Set();
+
+    while (chosen.size < Math.min(5, bits.length)) {
+      chosen.add(Math.floor(Math.random() * bits.length));
+    }
+
+    chosen.forEach(index => {
+      const bit = bits[index];
+      bit.textContent = bit.textContent === "0" ? "1" : "0";
+    });
+  }, 1000);
+})();
+</script>

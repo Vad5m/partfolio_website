@@ -1,4 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, send_from_directory, jsonify, Flask
+from flask_minify import Minify
 import os
 from werkzeug.utils import secure_filename
 import time
@@ -439,4 +440,5 @@ if __name__ == '__main__':
     app = Flask(__name__)
     app.secret_key = 'dev-secret-key'
     app.register_blueprint(bp)
+    Minify(app=app, html=True, js=True, cssless=True)
     app.run(debug=True, host='0.0.0.0', port=5000)

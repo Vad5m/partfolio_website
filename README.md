@@ -30,7 +30,7 @@ My website design is inspired by Pornhub. You can check out the pictures and see
 
 ### 1. Clone the repository
 ```bash
-git clone https://github.com/Vad5m/vad5m_dev.git
+git clone https://github.com/Vad5m/partfolio_website.git
 cd vad5m_dev
 ```
 

@@ -31,7 +31,7 @@ My website design is inspired by Pornhub. You can check out the pictures and see
 ### 1. Clone the repository
 ```bash
 git clone https://github.com/Vad5m/partfolio_website.git
-cd vad5m_dev
+cd partfolio_website
 ```
 
 ### 2. Set up Python virtual environment (recommended)
@@ -75,7 +75,7 @@ http://localhost:5000
 ## 🗂️ Project Structure
 
 ```
-vad5m_dev/
+partfolio_website/
 ├── main.py                 
 ├── projects.db            
 ├── templates/

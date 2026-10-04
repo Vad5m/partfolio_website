@@ -1,0 +1,189 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: #0a0808;
+    min-height: 100vh;
+    font-family: 'Space Grotesk', sans-serif;
+    color: #e8ddd0;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.gradient-bg {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    background:
+        radial-gradient(ellipse at 30% 20%, rgba(247, 151, 29, 0.07) 0%, transparent 55%),
+        radial-gradient(ellipse at 70% 80%, rgba(247, 151, 29, 0.04) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 50%, rgba(247, 151, 29, 0.02) 0%, transparent 40%),
+        #0a0808;
+    animation: breathe 14s ease-in-out infinite alternate;
+}
+
+@keyframes breathe {
+    0% { opacity: 0.7; transform: scale(1); }
+    100% { opacity: 1; transform: scale(1.06); }
+}
+
+.login-wrapper {
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    max-width: 420px;
+    padding: 1.5rem;
+}
+
+.login-form {
+    background: #14100e;
+    border: 1px solid rgba(247, 151, 29, 0.1);
+    border-radius: 48px;
+    padding: 3rem 2.5rem 2.5rem;
+    box-shadow: 0 40px 80px rgba(0, 0, 0, 0.8);
+    animation: modalFade 0.4s ease;
+    text-align: center;
+}
+
+@keyframes modalFade {
+    0% { opacity: 0; transform: scale(0.94) translateY(20px); }
+    100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.login-form .logo {
+    font-size: 2.2rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    color: #e8ddd0;
+}
+
+.login-form .logo span {
+    background: #f7971d;
+    color: #0a0808;
+    padding: 0 4px;
+    border-radius: 6px;
+    margin-left: 2px;
+}
+
+.login-form h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 0.3rem;
+    color: #e8ddd0;
+}
+
+.login-form .sub {
+    color: rgba(200, 180, 160, 0.3);
+    font-weight: 300;
+    font-size: 0.9rem;
+    margin-bottom: 2rem;
+}
+
+.flash-message {
+    padding: 0.8rem 1rem;
+    border-radius: 16px;
+    margin-bottom: 1rem;
+    font-weight: 500;
+    font-size: 0.9rem;
+    animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+    0% { opacity: 0; transform: translateY(-10px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+.flash-message.error {
+    background: rgba(255, 50, 50, 0.15);
+    border: 1px solid rgba(255, 50, 50, 0.2);
+    color: #ff6b6b;
+}
+
+.input-group {
+    position: relative;
+    margin-top: 1.5rem;
+    text-align: left;
+}
+
+.input {
+    border: solid 1.5px #9e9e9e;
+    border-radius: 1rem;
+    background: none;
+    padding: 1rem;
+    font-size: 1rem;
+    color: #f5f5f5;
+    transition: border 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    width: 100%;
+    font-family: 'Space Grotesk', sans-serif;
+}
+
+.input:focus, .input:not(:placeholder-shown) {
+    outline: none;
+    border: 1.5px solid #f7971d;
+}
+
+.input:focus ~ .user-label, .input:not(:placeholder-shown) ~ .user-label {
+    transform: translateY(-50%) scale(0.8);
+    background-color: #14100e;
+    padding: 0 0.4em;
+    color: #f7971d;
+}
+
+.user-label {
+    position: absolute;
+    left: 15px;
+    color: #9e9e9e;
+    pointer-events: none;
+    transform: translateY(1rem);
+    transition: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    background-color: transparent;
+    padding: 0 0.2em;
+    font-size: 1rem;
+}
+
+.input::placeholder {
+    color: transparent;
+}
+
+.btn-submit {
+    width: 100%;
+    padding: 0.9rem 1.2rem;
+    border-radius: 40px;
+    border: none;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: 0.25s;
+    font-family: 'Space Grotesk', sans-serif;
+    background: #f7971d;
+    color: #0a0808;
+    margin-top: 2rem;
+}
+
+.btn-submit:hover {
+    background: #f8a03a;
+    transform: scale(1.02);
+}
+
+.btn-submit:active {
+    transform: scale(0.98);
+}
+
+.back-link {
+    display: inline-block;
+    margin-top: 1.5rem;
+    color: rgba(200, 180, 160, 0.4);
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: 0.2s;
+}
+
+.back-link:hover {
+    color: #e8ddd0;
+}

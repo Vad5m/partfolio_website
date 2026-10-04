@@ -1,5 +1,5 @@
 (function() {
-    const isAdmin = window.location.search.includes('admin');
+    const isAdmin = window.IS_ADMIN || false;
     const adminBadge = document.getElementById('adminBadge');
     const addBtnWrapper = document.getElementById('addBtnWrapper');
 
@@ -9,15 +9,15 @@
 
     function updateAdminUI() {
         if (isAdmin) {
-            adminBadge.classList.add('show');
-            addBtnWrapper.classList.remove('hidden');
+            if (adminBadge) adminBadge.classList.add('show');
+            if (addBtnWrapper) addBtnWrapper.classList.remove('hidden');
             document.querySelectorAll('.action-buttons').forEach(btn => {
                 btn.classList.add('show');
                 btn.style.display = 'flex';
             });
         } else {
-            adminBadge.classList.remove('show');
-            addBtnWrapper.classList.add('hidden');
+            if (adminBadge) adminBadge.classList.remove('show');
+            if (addBtnWrapper) addBtnWrapper.classList.add('hidden');
             document.querySelectorAll('.action-buttons').forEach(btn => {
                 btn.classList.remove('show');
                 btn.style.display = 'none';
@@ -29,6 +29,7 @@
 
     function showToast(message, type = 'success') {
         const toast = document.getElementById('toast');
+        if (!toast) return;
         toast.textContent = message;
         toast.className = `toast ${type}`;
         toast.style.display = 'block';
@@ -147,6 +148,7 @@
     let editMode = false;
 
     function openModal(mode = 'add', data = null) {
+        if (!isAdmin) return;
         editMode = mode === 'edit';
         form.querySelectorAll('input[name="delete_media[]"]').forEach(el => el.remove());
 
@@ -205,6 +207,7 @@
     }
 
     function closeModal() {
+        if (!overlay) return;
         overlay.classList.remove('open');
         document.body.style.overflow = '';
         form.reset();
@@ -232,6 +235,7 @@
     let savedFiles = [];
 
     function updateFileList() {
+        if (!fileList) return;
         fileList.innerHTML = '';
         const files = fileInput.files;
         for (let i = 0; i < files.length; i++) {
@@ -326,13 +330,14 @@
     let pendingDeleteId = null;
 
     function openConfirm(projectId) {
+        if (!isAdmin) return;
         pendingDeleteId = projectId;
-        confirmOverlay.classList.add('open');
+        if (confirmOverlay) confirmOverlay.classList.add('open');
         document.body.style.overflow = 'hidden';
     }
 
     function closeConfirm() {
-        confirmOverlay.classList.remove('open');
+        if (confirmOverlay) confirmOverlay.classList.remove('open');
         document.body.style.overflow = '';
         pendingDeleteId = null;
     }
@@ -389,6 +394,7 @@
     }
 
     function closeViewer() {
+        if (!viewerOverlay) return;
         viewerOverlay.classList.remove('open');
         document.body.style.overflow = '';
         slidesTrack.innerHTML = '';
@@ -397,6 +403,7 @@
     }
 
     function buildSlides() {
+        if (!slidesTrack) return;
         slidesTrack.innerHTML = '';
         if (!currentProjectData || !currentProjectData.media || currentProjectData.media.length === 0) {
             slidesTrack.innerHTML = '<div style="color: rgba(200,180,160,0.3); padding: 2rem; text-align: center; width: 100%;">Нет медиа</div>';
@@ -422,26 +429,26 @@
         if (!currentProjectData || !currentProjectData.media || currentProjectData.media.length === 0) return;
         const offset = -currentSlideIndex * 100;
         slidesTrack.style.transform = `translateX(${offset}%)`;
-        viewerCounter.textContent = `${currentSlideIndex + 1} / ${currentProjectData.media.length}`;
+        if (viewerCounter) viewerCounter.textContent = `${currentSlideIndex + 1} / ${currentProjectData.media.length}`;
     }
 
     function updateInfo() {
         if (!currentProjectData) return;
 
-        viewerTitle.textContent = currentProjectData.title || 'Без названия';
-        viewerDesc.textContent = currentProjectData.description || '';
-        viewerTags.innerHTML = (currentProjectData.tags || []).map(t => `<span>${t}</span>`).join('');
+        if (viewerTitle) viewerTitle.textContent = currentProjectData.title || 'Без названия';
+        if (viewerDesc) viewerDesc.textContent = currentProjectData.description || '';
+        if (viewerTags) viewerTags.innerHTML = (currentProjectData.tags || []).map(t => `<span>${t}</span>`).join('');
 
-        if (currentProjectData.link) {
+        if (currentProjectData.link && viewerLink) {
             viewerLink.href = currentProjectData.link;
             viewerLink.style.display = 'inline-flex';
-        } else {
+        } else if (viewerLink) {
             viewerLink.style.display = 'none';
         }
 
         const total = currentProjectData.media ? currentProjectData.media.length : 0;
-        viewerPrev.style.display = total > 1 ? 'flex' : 'none';
-        viewerNext.style.display = total > 1 ? 'flex' : 'none';
+        if (viewerPrev) viewerPrev.style.display = total > 1 ? 'flex' : 'none';
+        if (viewerNext) viewerNext.style.display = total > 1 ? 'flex' : 'none';
     }
 
     function goToSlide(index) {
@@ -471,7 +478,7 @@
         if (!currentProjectData) return;
         const total = currentProjectData.media ? currentProjectData.media.length : 0;
         if (total <= 1) return;
-        goToSlide(currentProjectData.currentSlideIndex - 1);
+        goToSlide(currentSlideIndex - 1);
     }
 
     if (viewerPrev) viewerPrev.addEventListener('click', prevSlide);
@@ -485,7 +492,7 @@
     }
 
     document.addEventListener('keydown', function(e) {
-        if (!viewerOverlay.classList.contains('open')) return;
+        if (!viewerOverlay || !viewerOverlay.classList.contains('open')) return;
         if (e.key === 'ArrowLeft') prevSlide();
         if (e.key === 'ArrowRight') nextSlide();
         if (e.key === 'Escape') closeViewer();
@@ -494,7 +501,7 @@
     const logoBtn = document.getElementById('logoBtn');
     if (logoBtn) {
         logoBtn.addEventListener('click', function() {
-            window.location.href = INDEX_URL;
+            window.location.href = INDEX_URL || '/';
         });
     }
 

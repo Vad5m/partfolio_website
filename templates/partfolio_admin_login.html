@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>vad5m_dev · вход</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('portfolio.static', filename='css/partfolio_admin_login.css') }}">
+</head>
+<body>
+    <div class="gradient-bg"></div>
+    <div class="login-wrapper">
+        <form class="login-form" method="POST" action="{{ url_for('portfolio.admin_login', next=request.args.get('next', url_for('portfolio.partfolio'))) }}">
+            <div class="logo">vad5m<span>dev</span></div>
+            <h2>Вход администратора</h2>
+            <p class="sub">Введите пароль для доступа к редактированию</p>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="flash-message {{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <div class="input-group">
+                <input required type="password" name="password" id="password" class="input" placeholder=" " autocomplete="current-password" autofocus>
+                <label class="user-label" for="password">Пароль</label>
+            </div>
+
+            <button type="submit" class="btn-submit">Войти</button>
+            <a href="{{ url_for('portfolio.index') }}" class="back-link">← На главную</a>
+        </form>
+    </div>
+</body>
+</html>

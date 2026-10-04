@@ -7,7 +7,6 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
-
     <link rel="stylesheet" href="{{ url_for('portfolio.static', filename='css/partfolio_about.css') }}">
 </head>
 <body>
@@ -39,8 +38,11 @@
     </div>
 
     <div class="main-content">
-        <div style="display: flex; justify-content: center; margin-top: 0.5rem;">
-            <span class="admin-badge" id="adminBadge">🔐 Режим администратора</span>
+        <div style="display: flex; justify-content: center; margin-top: 0.5rem; gap: 1rem;">
+            {% if is_admin %}
+            <span class="admin-badge show" id="adminBadge">🔐 Режим администратора</span>
+            <a href="{{ url_for('portfolio.admin_logout') }}" class="admin-badge show" style="text-decoration:none;">Выйти</a>
+            {% endif %}
         </div>
 
         <div class="flash-messages">
@@ -101,7 +103,7 @@
             {% endif %}
         </div>
 
-        <div class="add-btn-wrapper" id="addBtnWrapper">
+        <div class="add-btn-wrapper {% if not is_admin %}hidden{% endif %}" id="addBtnWrapper">
             <button class="add-btn" id="addProjectBtn">＋ Добавить запись</button>
         </div>
     </div>
@@ -190,6 +192,12 @@
 
     <div class="toast" id="toast"></div>
 
+    <script>
+        window.ABOUT_URL = "{{ url_for('portfolio.about') }}";
+        window.DELETE_ABOUT_URL_BASE = "{{ url_for('portfolio.delete_about_project_route', project_id=0) }}".replace(/0$/, '');
+        window.INDEX_URL = "{{ url_for('portfolio.index') }}";
+        window.IS_ADMIN = {{ 'true' if is_admin else 'false' }};
+    </script>
     <script src="{{ url_for('portfolio.static', filename='js/partfolio_about.js') }}"></script>
 
 </body>

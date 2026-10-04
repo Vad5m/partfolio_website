@@ -353,8 +353,8 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 3rem;
-    margin-top: 1rem;
-    margin-bottom: 5rem;
+    margin-top: 6rem;
+    margin-bottom: 8rem;
     align-items: center;
 }
 
@@ -541,6 +541,7 @@
 }
 
 .carousel-section {
+    margin-top: 6rem;
     margin-bottom: 4rem;
 }
 .section-title {
@@ -557,10 +558,6 @@
     flex: 1;
     height: 1px;
     background: linear-gradient(90deg, rgba(247, 151, 29, 0.10), transparent);
-}
-.section-title .emoji {
-    font-size: 1.8rem;
-    line-height: 1;
 }
 
 .carousel-track-wrapper {
@@ -942,6 +939,8 @@
     .hero {
         grid-template-columns: 1fr;
         gap: 2rem;
+        margin-top: 4rem;
+        margin-bottom: 5rem;
     }
     .hero-visual {
         display: none !important;
@@ -974,9 +973,16 @@
     .carousel-card {
         width: 200px;
     }
+    .carousel-section {
+        margin-top: 4rem;
+    }
 }
 
 @media (max-width: 640px) {
+    .hero {
+        margin-top: 3rem;
+        margin-bottom: 4rem;
+    }
     .hero-text h1 {
         font-size: 2.8rem;
         flex-direction: column;
@@ -989,9 +995,16 @@
     .carousel-card {
         width: 160px;
     }
+    .carousel-section {
+        margin-top: 3rem;
+    }
 }
 
 @media (max-width: 430px) {
+    .hero {
+        margin-top: 2.5rem;
+        margin-bottom: 3rem;
+    }
     .hero-text h1 {
         font-size: 2.2rem;
     }
@@ -1001,5 +1014,8 @@
     }
     .carousel-card {
         width: 140px;
+    }
+    .carousel-section {
+        margin-top: 2.5rem;
     }
 }

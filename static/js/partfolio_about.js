@@ -1,4 +1,12 @@
 (function() {
+    const isAdmin = window.IS_ADMIN || false;
+    const adminBadge = document.getElementById('adminBadge');
+    const addBtnWrapper = document.getElementById('addBtnWrapper');
+
+    const ABOUT_URL = window.ABOUT_URL || '/about';
+    const DELETE_ABOUT_URL_BASE = window.DELETE_ABOUT_URL_BASE || '/delete_about_project/';
+    const INDEX_URL = window.INDEX_URL || '/';
+
     const container = document.getElementById('particles');
     if (container) {
         for (let i = 0; i < 60; i++) {
@@ -47,10 +55,6 @@
         });
     }
 
-    const isAdmin = window.location.search.includes('admin');
-    const adminBadge = document.getElementById('adminBadge');
-    const addBtnWrapper = document.getElementById('addBtnWrapper');
-
     function updateAdminUI() {
         if (isAdmin) {
             if (adminBadge) adminBadge.classList.add('show');
@@ -68,9 +72,6 @@
             });
         }
     }
-
-    const ABOUT_URL = window.ABOUT_URL || '/about';
-    const DELETE_ABOUT_URL_BASE = window.DELETE_ABOUT_URL_BASE || '/about/delete/';
 
     function initCardHandlers() {
         document.querySelectorAll('.project-card').forEach(card => {
@@ -140,6 +141,7 @@
     let editMode = false;
 
     function openModal(mode = 'add', data = null) {
+        if (!isAdmin) return;
         if (!overlay) return;
         editMode = mode === 'edit';
         form.querySelectorAll('input[name="delete_media[]"]').forEach(el => el.remove());
@@ -319,6 +321,7 @@
     let pendingDeleteId = null;
 
     function openConfirm(projectId) {
+        if (!isAdmin) return;
         pendingDeleteId = projectId;
         if (confirmOverlay) confirmOverlay.classList.add('open');
         document.body.style.overflow = 'hidden';
@@ -488,7 +491,7 @@
     const logoBtn = document.getElementById('logoBtn');
     if (logoBtn) {
         logoBtn.addEventListener('click', function() {
-            window.location.href = window.INDEX_URL || '/';
+            window.location.href = INDEX_URL || '/';
         });
     }
 

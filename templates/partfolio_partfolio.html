@@ -9,8 +9,11 @@
 {% endblock %}
 
 {% block content %}
-<div style="display: flex; justify-content: center; margin-top: 0.5rem;">
-    <span class="admin-badge" id="adminBadge">Режим администратора</span>
+<div style="display: flex; justify-content: center; margin-top: 0.5rem; gap: 1rem;">
+    {% if is_admin %}
+    <span class="admin-badge show" id="adminBadge">Режим администратора</span>
+    <a href="{{ url_for('portfolio.admin_logout') }}" class="admin-badge show" style="text-decoration:none;">Выйти</a>
+    {% endif %}
 </div>
 
 <div class="portfolio-grid" id="portfolioGrid">
@@ -58,7 +61,7 @@
     {% endif %}
 </div>
 
-<div class="add-btn-wrapper" id="addBtnWrapper">
+<div class="add-btn-wrapper {% if not is_admin %}hidden{% endif %}" id="addBtnWrapper">
     <button class="add-btn" id="addProjectBtn">＋ Добавить проект</button>
 </div>
 
@@ -152,6 +155,7 @@
     window.PARTFOLIO_URL = "{{ url_for('portfolio.partfolio') }}";
     window.DELETE_PROJECT_URL_BASE = "{{ url_for('portfolio.delete_project_route', project_id=0) }}".replace(/0$/, '');
     window.INDEX_URL = "{{ url_for('portfolio.index') }}";
+    window.IS_ADMIN = {{ 'true' if is_admin else 'false' }};
 </script>
 <script src="{{ url_for('portfolio.static', filename='js/partfolio_partfolio.js') }}"></script>
 {% endblock %}

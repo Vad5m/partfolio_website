@@ -1,10 +1,21 @@
 const preloaderFirst = document.getElementById('preloaderFirst');
 const preloaderSecond = document.getElementById('preloaderSecond');
+const headerWrapper = document.getElementById('headerWrapper');
+
+let headerShown = false;
+function showHeader() {
+    if (headerShown) return;
+    headerShown = true;
+    if (headerWrapper) {
+        headerWrapper.classList.add('visible');
+    }
+}
 
 setTimeout(function() {
     preloaderFirst.classList.add('hidden');
     setTimeout(function() {
         preloaderSecond.classList.add('hidden');
+        showHeader();
     }, 2000);
 }, 3000);
 
@@ -12,6 +23,7 @@ setTimeout(function() {
     preloaderFirst.classList.add('hidden');
     setTimeout(function() {
         preloaderSecond.classList.add('hidden');
+        showHeader();
     }, 2000);
 }, 5000);
 

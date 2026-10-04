@@ -404,3 +404,18 @@ body {
 .stagger-children.visible .feature-card:nth-child(4) { transition-delay: 0.26s; opacity: 1; transform: translateY(0); }
 .stagger-children.visible .feature-card:nth-child(5) { transition-delay: 0.33s; opacity: 1; transform: translateY(0); }
 .stagger-children.visible .feature-card:nth-child(6) { transition-delay: 0.40s; opacity: 1; transform: translateY(0); }
+
+
+.preloader-page .header-wrapper {
+    opacity: 0;
+    transform: translateY(-24px);
+    pointer-events: none;
+    transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.preloader-page .header-wrapper.visible {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}

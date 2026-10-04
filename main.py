@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, send_from_directory, jsonify, Flask
+from flask import Blueprint, render_template, request, redirect, url_for, flash, send_from_directory, jsonify, Flask, session
 from flask_minify import Minify
 import os
 from werkzeug.utils import secure_filename
@@ -6,14 +6,26 @@ import time
 import sqlite3
 import json
 from datetime import datetime
+from dotenv import load_dotenv
 
-TEMPLATE_FOLDER = os.path.join(os.path.dirname(__file__), 'templates')
-UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), 'static', 'uploads')
-DATABASE = os.path.join(os.path.dirname(__file__), 'projects.db')
+load_dotenv()
 
-bp = Blueprint('main', __name__,
-               url_prefix='/',
-               template_folder=TEMPLATE_FOLDER)
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+TEMPLATE_FOLDER = os.path.join(BASE_DIR, 'templates')
+STATIC_FOLDER   = os.path.join(BASE_DIR, 'static')
+UPLOAD_FOLDER   = os.path.join(STATIC_FOLDER, 'uploads')
+DATABASE        = os.path.join(BASE_DIR, 'projects.db')
+
+ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'admin')
+
+bp = Blueprint(
+    'portfolio',
+    __name__,
+    url_prefix='/',
+    template_folder=TEMPLATE_FOLDER,
+    static_folder=STATIC_FOLDER,
+    static_url_path='/static',
+)
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp', 'mp4', 'webm'}
 
@@ -263,13 +275,55 @@ def delete_about_project(project_id):
 
 init_db()
 
+print(f"BASE_DIR: {BASE_DIR}")
+print(f"STATIC_FOLDER: {STATIC_FOLDER}")
+print(f"STATIC_FOLDER существует: {os.path.exists(STATIC_FOLDER)}")
+print(f"CSS папка существует: {os.path.exists(os.path.join(STATIC_FOLDER, 'css'))}")
+print(f"JS папка существует: {os.path.exists(os.path.join(STATIC_FOLDER, 'js'))}")
+
+def is_admin():
+    return session.get('is_admin', False)
+
+def wants_admin():
+    return 'admin' in request.args
+
+def require_admin_or_redirect():
+    if not is_admin():
+        return redirect(url_for('portfolio.admin_login', next=request.url))
+    return None
+
 @bp.route('/')
 def index():
-    return redirect(url_for('main.partfolio'))
+    projects = get_projects()
+    return render_template('partfolio_index.html', projects=projects)
+
+@bp.route('/admin-login', methods=['GET', 'POST'])
+def admin_login():
+    if request.method == 'POST':
+        password = request.form.get('password', '')
+        if password == ADMIN_PASSWORD:
+            session['is_admin'] = True
+            session.permanent = True
+            next_url = request.args.get('next', url_for('portfolio.index'))
+            if 'admin' not in next_url:
+                next_url = next_url + ('&' if '?' in next_url else '?') + 'admin'
+            return redirect(next_url)
+        else:
+            flash('Неверный пароль', 'error')
+    return render_template('partfolio_admin_login.html')
+
+@bp.route('/admin-logout')
+def admin_logout():
+    session.pop('is_admin', None)
+    return redirect(url_for('portfolio.index'))
 
 @bp.route('/partfolio', methods=['GET', 'POST'])
 def partfolio():
     if request.method == 'POST':
+        if not is_admin():
+            flash('Требуется авторизация администратора', 'error')
+            return redirect(url_for('portfolio.admin_login', next=request.url))
+        # ... остальная логика POST без изменений
         title = request.form.get('title', '').strip()
         description = request.form.get('desc', '').strip()
         tags = request.form.get('tags', '').strip()
@@ -279,7 +333,7 @@ def partfolio():
 
         if not title or not description:
             flash('Fill in title and description', 'error')
-            return redirect(url_for('main.partfolio'))
+            return redirect(url_for('portfolio.partfolio'))
 
         os.makedirs(UPLOAD_FOLDER, exist_ok=True)
         saved_paths = []
@@ -296,7 +350,7 @@ def partfolio():
                     saved_paths.append(f'/uploads/{filename}')
                 elif file and file.filename:
                     flash(f'Invalid format: {file.filename}', 'error')
-                    return redirect(url_for('main.partfolio'))
+                    return redirect(url_for('portfolio.partfolio'))
 
         if edit_id:
             try:
@@ -318,25 +372,32 @@ def partfolio():
                     flash(f'Project "{title}" updated!', 'success')
                 else:
                     flash('Project not found', 'error')
-                return redirect(url_for('main.partfolio'))
+                return redirect(url_for('portfolio.partfolio'))
             except ValueError:
                 flash('Error editing project', 'error')
-                return redirect(url_for('main.partfolio'))
+                return redirect(url_for('portfolio.partfolio'))
 
         if not saved_paths:
             flash('Upload at least one image or video', 'error')
-            return redirect(url_for('main.partfolio'))
+            return redirect(url_for('portfolio.partfolio'))
 
         add_project(title, description, tags, saved_paths, link, about_content)
         flash(f'Project "{title}" added!', 'success')
-        return redirect(url_for('main.partfolio'))
+        return redirect(url_for('portfolio.partfolio'))
+
+    if wants_admin() and not is_admin():
+        return redirect(url_for('portfolio.admin_login', next=request.url))
 
     projects = get_projects()
-    return render_template('partfolio_partfolio.html', projects=projects)
+    return render_template('partfolio_partfolio.html', projects=projects, is_admin=is_admin())
 
 @bp.route('/about', methods=['GET', 'POST'])
 def about():
     if request.method == 'POST':
+        if not is_admin():
+            flash('Требуется авторизация администратора', 'error')
+            return redirect(url_for('portfolio.admin_login', next=request.url))
+        # ... остальная логика POST без изменений
         title = request.form.get('title', '').strip()
         description = request.form.get('desc', '').strip()
         tags = request.form.get('tags', '').strip()
@@ -346,7 +407,7 @@ def about():
 
         if not title or not description:
             flash('Fill in title and description', 'error')
-            return redirect(url_for('main.about'))
+            return redirect(url_for('portfolio.about'))
 
         os.makedirs(UPLOAD_FOLDER, exist_ok=True)
         saved_paths = []
@@ -363,7 +424,7 @@ def about():
                     saved_paths.append(f'/uploads/{filename}')
                 elif file and file.filename:
                     flash(f'Invalid format: {file.filename}', 'error')
-                    return redirect(url_for('main.about'))
+                    return redirect(url_for('portfolio.about'))
 
         if edit_id:
             try:
@@ -385,37 +446,46 @@ def about():
                     flash(f'Entry "{title}" updated!', 'success')
                 else:
                     flash('Entry not found', 'error')
-                return redirect(url_for('main.about'))
+                return redirect(url_for('portfolio.about'))
             except ValueError:
                 flash('Error editing entry', 'error')
-                return redirect(url_for('main.about'))
+                return redirect(url_for('portfolio.about'))
 
         if not saved_paths:
             flash('Upload at least one image or video', 'error')
-            return redirect(url_for('main.about'))
+            return redirect(url_for('portfolio.about'))
 
         add_about_project(title, description, tags, saved_paths, link, about_content)
         flash(f'Entry "{title}" added!', 'success')
-        return redirect(url_for('main.about'))
+        return redirect(url_for('portfolio.about'))
+
+    if wants_admin() and not is_admin():
+        return redirect(url_for('portfolio.admin_login', next=request.url))
 
     projects = get_about_projects()
-    return render_template('partfolio_about.html', projects=projects)
+    return render_template('partfolio_about.html', projects=projects, is_admin=is_admin())
 
 @bp.route('/delete_about_project/<int:project_id>', methods=['POST'])
 def delete_about_project_route(project_id):
+    if not is_admin():
+        flash('Требуется авторизация администратора', 'error')
+        return redirect(url_for('portfolio.admin_login', next=request.url))
     if delete_about_project(project_id):
         flash('Entry deleted', 'success')
     else:
         flash('Entry not found', 'error')
-    return redirect(url_for('main.about'))
+    return redirect(url_for('portfolio.about'))
 
 @bp.route('/delete_project/<int:project_id>', methods=['POST'])
 def delete_project_route(project_id):
+    if not is_admin():
+        flash('Требуется авторизация администратора', 'error')
+        return redirect(url_for('portfolio.admin_login', next=request.url))
     if delete_project(project_id):
         flash('Project deleted', 'success')
     else:
         flash('Project not found', 'error')
-    return redirect(url_for('main.partfolio'))
+    return redirect(url_for('portfolio.partfolio'))
 
 @bp.route('/uploads/<filename>')
 def uploaded_file(filename):
@@ -423,22 +493,8 @@ def uploaded_file(filename):
 
 @bp.route('/favicon.ico')
 def favicon():
-    static_dir = os.path.join(os.path.dirname(__file__), 'static')
-    return send_from_directory(static_dir, 'favicon.ico')
+    return send_from_directory(STATIC_FOLDER, 'favicon.ico')
 
 @bp.route('/fav.png')
 def fav_png():
-    static_dir = os.path.join(os.path.dirname(__file__), 'static')
-    return send_from_directory(static_dir, 'fav.png')
-
-@bp.route('/static/<path:filename>')
-def static_files(filename):
-    static_dir = os.path.join(os.path.dirname(__file__), 'static')
-    return send_from_directory(static_dir, filename)
-
-if __name__ == '__main__':
-    app = Flask(__name__)
-    app.secret_key = 'dev-secret-key'
-    app.register_blueprint(bp)
-    Minify(app=app, html=True, js=True, cssless=True)
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    return send_from_directory(STATIC_FOLDER, 'fav.png')
